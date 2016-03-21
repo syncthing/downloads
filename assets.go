@@ -93,9 +93,9 @@ func (a asset) FriendlyName() string {
 	case "amd64", "x64":
 		arch = "64 bit"
 	case "arm":
-		arch = "ARM"
+		arch = "ARM 32-bit"
 	case "arm64":
-		arch = "64 bit ARM"
+		arch = "ARM 64 bit"
 	default:
 		arch = a.Arch
 	}
