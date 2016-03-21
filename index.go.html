@@ -12,11 +12,12 @@
 		max-width: 100%;
 	}
 	</style>
-	<title>Backlog</title>
+	<title>Downloads</title>
 </head>
 <body>
 <div class="container">
-	<h1>Downloads</h1>
+	<img src="https://syncthing.net/images/logo-horizontal.svg" height="128" />
+	<h1>Downloads <span class="text-danger">BETA</span></h1>
 	{{range .}}
 		{{if ge (len .Versions) 0}}
 			<h2>{{.Repo.FriendlyName}} <a href="{{.Repo.GithubURL}}" target="_new"><small class="text-muted">{{.Repo.GithubName}}</small></a></h2>
