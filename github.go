@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+// The types in this file are the ones returned by the Github API. We
+// convert these to internal types that better fit our use case - see
+// assets.go.
+
+// A Github repository
 type githubRepo struct {
 	Name        string
 	FullName    string `json:"full_name"`
@@ -15,6 +20,8 @@ type githubRepo struct {
 	ReleasesURL string `json:"releases_url"`
 }
 
+// getRepo returns a Github repository, given it's name like
+// "syncthing/syncthing".
 func getRepo(name string) (githubRepo, error) {
 	resp, err := http.Get(fmt.Sprintf("https://api.github.com/repos/%s", name))
 	if err != nil {
@@ -30,21 +37,11 @@ func getRepo(name string) (githubRepo, error) {
 	return r, nil
 }
 
-type githubRelease struct {
-	Name   string
-	Tag    string `json:"tag_name"`
-	Assets []githubAsset
-}
-
-type githubAsset struct {
-	URL   string `json:"browser_download_url"`
-	Name  string
-	Label string
-}
-
-func (r githubRepo) getReleases() ([]githubRelease, error) {
+// getReleases returns the list of releases for a given repo, up to n of
+// them.
+func (r githubRepo) getReleases(n int) ([]githubRelease, error) {
 	url := strings.Replace(r.ReleasesURL, "{/id}", "", 1)
-	resp, err := http.Get(url + "?per_page=5")
+	resp, err := http.Get(fmt.Sprintf("%s?per_page=%d", url, n))
 	if err != nil {
 		return nil, err
 	}
@@ -56,4 +53,18 @@ func (r githubRepo) getReleases() ([]githubRelease, error) {
 	}
 
 	return rs, nil
+}
+
+// A Github release (i.e. a specific tag on a repository).
+type githubRelease struct {
+	Name   string
+	Tag    string `json:"tag_name"`
+	Assets []githubAsset
+}
+
+// A Github release asset (i.e. a specific file within a release).
+type githubAsset struct {
+	URL   string `json:"browser_download_url"`
+	Name  string
+	Label string
 }

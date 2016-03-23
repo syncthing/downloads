@@ -6,21 +6,28 @@ import (
 	"strings"
 )
 
-// The top level item per repository.
-type downloads struct {
-	Repo     repo
-	Versions []version
-}
-
-func (d downloads) OlderVersions() []version {
-	return d.Versions[1:]
-}
-
 type repo struct {
 	GithubName   string
 	FriendlyName string
 	Description  string
 	GithubURL    string
+	Versions     []version
+}
+
+func (r repo) HasLatestVersion() bool {
+	return len(r.Versions) > 0
+}
+
+func (r repo) LatestVersion() version {
+	return r.Versions[0]
+}
+
+func (r repo) HasOlderVersions() bool {
+	return len(r.Versions) > 1
+}
+
+func (r repo) OlderVersions() []version {
+	return r.Versions[1:]
 }
 
 // A given release version.

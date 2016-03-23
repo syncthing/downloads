@@ -1,6 +1,7 @@
 {
     "ListenAddr": "127.0.0.1:8891",
-    "CacheTime": 600000000000,
+    "RepoCacheTime": 3600000000000,
+    "TemplateCacheTime": 600000000000,
     "Repos": [
         {
             "FriendlyName": "Syncthing",
