@@ -11,8 +11,102 @@
 	img {
 		max-width: 100%;
 	}
+	.highlight{
+		background: #bada55;
+	}
 	</style>
-	<title>Downloads</title>
+	<title>Syncthing Downloads</title>
+<script>
+var linux32 = ['i386','i486','i586','i686','armv7','armv6'];
+var linux64 = ['x86_64','amd64','armv8'];
+var windo64 = ['WOW64','Win64','x64'];
+
+function c(needles,haystack){
+	var f=false;
+	for(var i=0; i<needles.length; i++)	if(haystack.indexOf(needles[i]) > -1) f=true;
+	return f;
+};
+
+function ua2dl(ua){
+	var out = [];
+	if(c(['DragonFly'],ua)	&& !c(linux32,ua))
+	out.push('Dragonfly BSD (64 bit)');
+
+	if(c(['FreeBSD'],ua)	&& c(linux32,ua))
+	out.push('FreeBSD (32 bit)');
+
+	if(c(['FreeBSD'],ua)	&& c(linux64,ua))
+	out.push('FreeBSD (64 bit)');
+
+	if(c(['Linux'],ua)		&& c(linux32,ua)		&& !c(['Linux arm','Android'],ua))
+	out.push('Linux (32 bit)');
+
+	if(c(['Linux'],ua)		&& c(linux64,ua)		&& !c(['Linux arm','Android'],ua))
+	out.push('Linux (64 bit)');
+
+	if(c(['Linux arm'],ua)	&& c(linux32,ua)		&& !c(['Android'],ua))
+	out.push('Linux (ARM 32-bit)');
+
+	if(c(['Linux arm'],ua)	&& c(linux64,ua)		&& !c(['Android'],ua))
+	out.push('Linux (ARM 64-bit)');
+
+	if(c(['Linux'],ua)		&& c(['ppc64'],ua))
+	out.push('Linux (ppc64)');
+
+	//Linux (ppc64le)
+	//help needed
+
+	if(c(['Mac OS X'],ua)	&& !c(['PPC','iPod','iPhone','iPad','10_6_7','10_6_6','10_6_5','10_6_4','10_6_3','10_6_2','10_6_1','10_6_0','10_5'],ua))
+	out.push('Mac OS X (64 bit)');
+
+	if(c(['NetBSD'],ua)		&& c(linux32,ua))
+	out.push('NetBSD (32 bit)');
+
+	if(c(['NetBSD'],ua)		&& c(linux64,ua))
+	out.push('NetBSD (64 bit)');
+
+	if(c(['OpenBSD'],ua)	&& c(linux32,ua))
+	out.push('OpenBSD (32 bit)');
+
+	if(c(['OpenBSD'],ua)	&& c(linux64,ua))
+	out.push('OpenBSD (64 bit)');
+
+	if(c(['SunOS'],ua))
+	out.push('Solaris/Illumos/SmartOS (64 bit)');
+
+	if(c(['Win'],ua)		&& !c(windo64,ua))
+	out.push('Windows (32 bit)');
+
+	if(c(['Win'],ua)		&& c(windo64,ua))
+	out.push('Windows (64 bit)');
+
+	if(c(['Android'],ua))
+	out.push('Android');
+
+	if(c(['Debian','Ubuntu'],ua))
+	out.push('Debian / Ubuntu packages');
+
+	return out;
+};
+
+
+$(function() {
+	var res = ua2dl(navigator.userAgent);
+	for(var i=0; i<res.length; i++)	$('a:contains('+res[i]+')').addClass('highlight');
+});
+</script>
+<script>
+$(function () {
+
+	//https://jsfiddle.net/7uxyrrkv/623/
+	$('.toggle').click(function (event) {
+		event.preventDefault();
+		var target = $(this).attr('href');
+		$(target).toggleClass('hidden show');
+	});
+
+});
+</script>
 </head>
 <body>
 <div class="container">
@@ -20,30 +114,43 @@
 	<h1>Downloads <span class="text-danger">BETA</span></h1>
 	{{range .}}
 		{{if .HasLatestVersion}}
-			<h2>{{.FriendlyName}} <a href="{{.GithubURL}}" target="_new"><small class="text-muted">{{.GithubName}}</small></a></h2>
-			<p>{{.Description}}</p>
-			{{with .LatestVersion}}
-				<h3>Version {{.FriendlyName}}</h3>
-				<ul>
-				{{range .SortedAssets}}
-					<li><a href="{{.URL}}">{{.FriendlyName}}</a></li>
-				{{end}}
-				</ul>
-			{{end}}
-
-			{{if .HasOlderVersions}}
-			<details>
-				<summary>Older versions</summary>
-				{{range .OlderVersions}}
-					<h4>Version {{.FriendlyName}}</h4>
-					<ul>
-					{{range .SortedAssets}}
-						<li><a href="{{.URL}}">{{.FriendlyName}}</a></li>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<h2>{{.FriendlyName}} <a href="{{.GithubURL}}" target="_new"><small class="text-muted">{{.GithubName}}</small></a></h2>
+					<p>{{.Description}}</p>
+					{{with .LatestVersion}}
+						<h3>Version {{.FriendlyName}}</h3>
+						<ul>
+						{{range .SortedAssets}}
+							<li><a href="{{.URL}}">{{.FriendlyName}}</a></li>
+						{{end}}
+						</ul>
 					{{end}}
-					</ul>
-				{{end}}
-			</details>
-			{{end}}
+
+					{{if .IsSyncthing}}
+						<ul>
+							<li><a href="http://apt.syncthing.net/">Debian / Ubuntu packages</a></li>
+							<li><a href="https://play.google.com/store/apps/details?id=com.nutomic.syncthingandroid">Android: Google Play</a></li>
+							<li><a href="https://f-droid.org/repository/browse/?fdid=com.nutomic.syncthingandroid">Android: F-Droid</a></li>
+						</ul>
+					{{end}}
+
+					{{if .HasOlderVersions}}
+					<a href="#older-versions-{{.CssName}}" class="toggle btn btn-primary">Show older versions</a>
+					<details id="older-versions-{{.CssName}}" class="hidden">
+						<summary>Older versions</summary>
+						{{range .OlderVersions}}
+							<h4>Version {{.FriendlyName}}</h4>
+							<ul>
+							{{range .SortedAssets}}
+								<li><a href="{{.URL}}">{{.FriendlyName}}</a></li>
+							{{end}}
+							</ul>
+						{{end}}
+					</details>
+					{{end}}
+				</div>
+			</div>
 		{{end}}
 	{{end}}
 </div>

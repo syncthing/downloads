@@ -9,6 +9,8 @@ import (
 type repo struct {
 	GithubName   string
 	FriendlyName string
+	CssName      string
+	IsSyncthing  bool
 	Description  string
 	GithubURL    string
 	Versions     []version

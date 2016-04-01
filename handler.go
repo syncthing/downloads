@@ -81,6 +81,8 @@ func getRepository(rc repoCfg) (repo, error) {
 	r := repo{
 		FriendlyName: rc.FriendlyName,
 		GithubName:   gr.FullName,
+		CssName:      strings.ToLower(strings.Replace(rc.FriendlyName, " ", "-", -1)),
+		IsSyncthing:  strings.Compare(rc.FriendlyName, "Syncthing")==0,
 		Description:  gr.Description,
 		GithubURL:    gr.URL,
 	}

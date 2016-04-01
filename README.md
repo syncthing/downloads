@@ -7,6 +7,7 @@ Running for development
 -----------------------
 
 - `go run *.go`
+- windows users: `go build` then run downloads.exe
 - Open http://localhost:8891/ in your browser
 - Tweak the `index.html` and reload (reduce `TemplateCacheTime` in the config when developing).
 
